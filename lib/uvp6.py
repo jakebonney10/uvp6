@@ -64,5 +64,21 @@ class UVP6:
         }
         return black_data_dict
 
-    # Add any additional methods needed for handling responses
+    def parse_message(self, message):
+            if message.startswith("45HW_CONF"):
+                message_type = "HW_CONF"
+                parsed_data = self.parse_hwconf(message)
+            elif message.startswith("ACQ_CONF"):
+                message_type = "ACQ_CONF"
+                parsed_data = self.parse_acqconf(message)
+            elif message.startswith("LPM_DATA"):
+                message_type = "LPM_DATA"
+                parsed_data = self.parse_lpm_data(message)
+            elif message.startswith("BLACK_DATA"):
+                message_type = "BLACK_DATA"
+                parsed_data = self.parse_black_data(message)
+            else:
+                message_type = "UNKNOWN"
+                parsed_data = None
 
+            return message_type, parsed_data
