@@ -7,12 +7,16 @@ class UVP6:
         time.sleep(2)  # wait for the serial connection to initialize
 
     def send_command(self, command):
-        self.ser.write(f'{command}\r\n'.encode())
-        response = self.ser.readline().decode().strip()
-        if response == "$starterr:33;":
-            self.ser.write(f'{command}\r\n'.encode())  # repeat command
+        try:
+            self.ser.write(f'{command}\r\n'.encode())
             response = self.ser.readline().decode().strip()
-        return response
+            if response == "$starterr:33;":
+                self.ser.write(f'{command}\r\n'.encode())  # repeat command
+                response = self.ser.readline().decode().strip()
+            return response
+        except serial.SerialException as e:
+            # Handle serial communication error
+            print(f"Serial communication error: {e}")
 
     def start_acquisition(self, parameter_set, date=None, time=None):
         if date and time:
@@ -135,3 +139,26 @@ class UVP6:
             parsed_data = None
 
         return message_type, parsed_data
+
+    def reconnect(self):
+        if not self.ser.is_open:
+            try:
+                self.ser.open()
+                print("Reconnected to the serial port.")
+            except Exception as e:
+                print(f"Failed to reconnect: {e}")
+        else:
+            print("Already connected to the serial port.")
+
+    def close_connection(self):
+        if self.ser.is_open:
+            try:
+                # add pre-closure steps here, if needed
+                # For example, sending a command to the device to signal closing
+
+                self.ser.close()
+                print("Serial connection closed successfully.")
+            except Exception as e:
+                print(f"Error closing serial connection: {e}")
+        else:
+            print("Serial connection is already closed.")
