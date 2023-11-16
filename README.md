@@ -24,6 +24,12 @@ Run the UVP6 driver node using:
 rosrun uvp6 uvp6_driver.py
 ```
 
+Or alternatively, run the driver using the launch file, specifying the serial port and baudrate within the launch file.
+
+```bash
+roslaunch uvp6 upv6.launch
+```
+
 ## Custom ROS Messages
 This package includes custom ROS messages for different data frames from the UVP6:
 
