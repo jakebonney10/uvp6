@@ -32,6 +32,21 @@ This package includes custom ROS messages for different data frames from the UVP
 - `LPMDataMsg`
 - `BlackDataMsg`
 
+## Setting Parameters via Command Line
+
+Before running the UVP6 driver node, you can set the serial port and baud rate parameters using the ROS command line interface. This is useful for configuring the connection to the UVP6 instrument according to your setup.
+
+Use the following `rosparam` commands to set these parameters:
+
+```bash
+rosparam set /uvp6_driver/port YOUR_SERIAL_PORT
+rosparam set /uvp6_driver/baudrate YOUR_BAUD_RATE
+```
+
+Replace YOUR_SERIAL_PORT with the actual serial port your UVP6 instrument is connected to (e.g., /dev/ttyUSB0 for Linux or COM3 for Windows) and YOUR_BAUD_RATE with the desired baud rate (e.g., 9600).
+
+After setting these parameters, you can run the UVP6 driver node as described in the Usage section.
+
 ## UVP6 Instrument Details
 
 ### Sensor Description

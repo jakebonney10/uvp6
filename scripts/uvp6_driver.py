@@ -8,8 +8,12 @@ class UVP6DriverNode:
         # Initialize the node
         rospy.init_node('uvp6_driver')
 
+        # Retrieve serial connection cfg from the parameter server or use default values
+        port = rospy.get_param('~port', '/dev/ttyUSB0')
+        baudrate = rospy.get_param('~baudrate', 9600)
+
         # Create a UVP6 object
-        self.uvp6 = UVP6("/dev/ttyUSB0", 9600)  # Adjust the port and baud rate as needed
+        self.uvp6 = UVP6(port, baudrate)  # Adjust the port and baud rate as needed
 
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hwconf', HWconfMsg, queue_size=10)
