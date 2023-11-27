@@ -7,22 +7,21 @@ class UVP6:
         time.sleep(2)  # wait for the serial connection to initialize
 
     def send_command(self, command):
-        """Send a command to the UVP6 instrument."""
+        """Send a command to the UVP6 instrument and read response."""
         self.ser.write(f'{command}\r\n'.encode())
         return self.read_response()
 
     def read_response(self):
         """Read response from UVP6 instrument."""
         response = self.ser.readline().decode().strip()
-        # Additional logic to handle different types of responses
         return response
 
-    def start_acquisition(self, parameter_set, date=None, time=None):
-        """Start data acquisition."""
+    def start_acquisition(self, acq_conf, date=None, time=None):
+        """Start data acquisition (Ex. Format start:ACQ_XX,20220223,040051;)."""
         if date and time:
-            command = f'$start:{parameter_set},{date},{time};'
+            command = f'$start:{str(acq_conf).zfill(2)},{date},{time};'
         else:
-            command = f'$start:{parameter_set};'
+            command = f'$start:{str(acq_conf).zfill(2)};'
         return self.send_command(command)
 
     def stop_acquisition(self):
@@ -30,8 +29,22 @@ class UVP6:
         return self.send_command('$stop;')
 
     def autocheck(self):
-        """Perform autocheck of the instrument."""
+        """Perform autocheck."""
         return self.send_command('$autocheck;')
+
+    def confcheck(self, acq_conf=1):
+        """Perform check of aquisition configuration, specify 1-10."""
+        command = f'$confcheck:ACQ_{str(acq_conf).zfill(2)};'
+        return self.send_command(command)
+
+    def hwconfcheck(self):
+        """Perform check of hardware configuration."""
+        return self.send_command('$hwconfcheck;')
+
+    def taxocheck(self, taxo_conf=1):
+        """Perform check of taxonomy configuration, specify 1-10."""
+        command = f'$taxocheck:TAXO_{str(taxo_conf).zfill(2)};'
+        return self.send_command(command)
 
     def parse_hwconf(self, hwconf_frame):
         """Parse the hardware configuration serial message from UVP6."""
@@ -169,7 +182,22 @@ class UVP6:
 
     def parse_message(self, message):
         """Handle different serial responses from UVP6."""
-        if message.startswith("45HW_CONF"):
+        if message.startswith("$starterr:33;"): #instrument is busy/sleepy
+            message_type = "ERROR"
+            parsed_data = False
+        elif message.startswith("$starterr:44;"): #overexposed error
+            message_type = "ERROR"
+            parsed_data = False
+        elif message.startswith("$stopack;"):
+            message_type = "STOP_ACK"
+            parsed_data = None
+        elif message.startswith("$startack;"):
+            message_type = "START_ACK"
+            parsed_data = True
+        elif message.startswith("$autocheckpassed;"):
+            message_type = "Autocheck"
+            parsed_data = True
+        elif message.startswith("HW_CONF"):
             message_type = "HW_CONF"
             parsed_data = self.parse_hwconf(message)
         elif message.startswith("ACQ_CONF"):
@@ -208,7 +236,6 @@ class UVP6:
         """Close connection to UVP6 and stop data aquisition for soft shutdown."""
         if self.ser.is_open:
             try:
-                # add pre-closure steps here
                 self.stop_acquisition()
                 self.ser.close()
                 print("Serial connection closed successfully.")
