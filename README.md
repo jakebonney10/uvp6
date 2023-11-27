@@ -43,11 +43,13 @@ roslaunch uvp6 upv6.launch
 ## Custom ROS Messages
 This package includes custom ROS messages for different data frames from the UVP6:
 
-- `HWconfMsg`: Hardware configuration data.
-- `ACQconfMsg`: Acquisition configuration data.
-- `TAXOconfMsg`: 
-- `LPMDataMsg`: Large particle measurement data.
-- `BlackDataMsg`: Data from black frames.
+- `HWconf`: Hardware configuration data.
+- `ACQconf`: Acquisition configuration data.
+- `TAXOconf`: 
+- `LPMData`: Large particle measurement data.
+- `BlackData`: Data from black frames.
+- `TaxoData`: 
+- `ObjectData`: 
 
 ## Setting Parameters via Command Line
 
