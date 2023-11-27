@@ -8,8 +8,13 @@ class UVP6:
 
     def send_command(self, command):
         """Send a command to the UVP6 instrument and read response."""
-        self.ser.write(f'{command}\r\n'.encode())
-        return self.read_response()
+        try:
+            self.ser.write(f'{command}\r\n'.encode())
+            return self.read_response()
+        except serial.SerialException as e:
+            print(f"Serial communication error: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
 
     def read_response(self):
         """Read response from UVP6 instrument."""
