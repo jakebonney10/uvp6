@@ -1,0 +1,49 @@
+Header header
+string frame_name # Frame name
+string configuration_name # Name used to set this configuration into the field Taxo_conf
+string model_reference # Taxonomic classification model to be use
+int32 max_size_for_classification # Maximum vignette size to perform the embedded classification
+int32 model_nb_classes # Number of classes used by the classification model
+
+# Ecotaxa taxonomic unique identifier for each class
+int32 taxo_id_for_class_00
+int32 taxo_id_for_class_01
+int32 taxo_id_for_class_03
+int32 taxo_id_for_class_04
+int32 taxo_id_for_class_05
+int32 taxo_id_for_class_06
+int32 taxo_id_for_class_07
+int32 taxo_id_for_class_08
+int32 taxo_id_for_class_09
+int32 taxo_id_for_class_10
+int32 taxo_id_for_class_11
+int32 taxo_id_for_class_12
+int32 taxo_id_for_class_13
+int32 taxo_id_for_class_14
+int32 taxo_id_for_class_15
+int32 taxo_id_for_class_16
+int32 taxo_id_for_class_17
+int32 taxo_id_for_class_18
+int32 taxo_id_for_class_19
+int32 taxo_id_for_class_20
+int32 taxo_id_for_class_21
+int32 taxo_id_for_class_22
+int32 taxo_id_for_class_23
+int32 taxo_id_for_class_24
+int32 taxo_id_for_class_25
+int32 taxo_id_for_class_26
+int32 taxo_id_for_class_27
+int32 taxo_id_for_class_28
+int32 taxo_id_for_class_29
+int32 taxo_id_for_class_30
+int32 taxo_id_for_class_31
+int32 taxo_id_for_class_32
+int32 taxo_id_for_class_33
+int32 taxo_id_for_class_34
+int32 taxo_id_for_class_35
+int32 taxo_id_for_class_36
+int32 taxo_id_for_class_37
+int32 taxo_id_for_class_38
+int32 taxo_id_for_class_39
+int32 taxo_id_for_class_40
+
