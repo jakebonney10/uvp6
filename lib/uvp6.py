@@ -12,9 +12,9 @@ class UVP6:
             self.ser.write(f'{command}\r\n'.encode())
             return self.read_response()
         except serial.SerialException as e:
-            print(f"Serial communication error: {e}")
+            print(f"Serial communication error: {e}") #TODO: handle this error, ROS logging instead of print?
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"Unexpected error: {e}") #TODO: handle this error, ROS logging instead of print?
 
     def read_response(self):
         """Read response from UVP6 instrument."""
@@ -50,6 +50,31 @@ class UVP6:
         """Perform check of taxonomy configuration, specify 1-10."""
         command = f'$taxocheck:TAXO_{str(taxo_conf).zfill(2)};'
         return self.send_command(command)
+
+    def message_handler(self, message):
+        """Handle messages from UVP6"""
+        response_handlers = {
+            "$starterr:33;": self.handle_error,
+            "$starterr:44;": self.handle_error,
+            "$stopack;": self.handle_stop_ack, #TODO:
+            "$startack;": self.handle_start_ack, #TODO:
+            "$autocheckpassed;": self.handle_autocheck, #TODO:
+            "HW_CONF": self.parse_hwconf,
+            "ACQ_CONF": self.parse_acqconf,
+            "TAXO_CONF": self.parse_taxoconf,
+            "LPM_DATA": self.parse_lpm_data,
+            "BLACK_DATA": self.parse_black_data,
+            "TAXO_DATA": self.parse_taxo_data
+        }
+
+        for key in response_handlers:
+            if message.startswith(key):
+                return key, response_handlers[key](message)
+
+        return "UNKNOWN", None
+
+    def handle_error(self, message):
+        return False  # TODO: or any appropriate handling
 
     def parse_hwconf(self, hwconf_frame):
         """Parse the hardware configuration serial message from UVP6."""
@@ -184,47 +209,6 @@ class UVP6:
             taxo_data_dict["Objects"].append(object_data)
 
         return taxo_data_dict
-
-    def parse_message(self, message):
-        """Handle different serial responses from UVP6."""
-        if message.startswith("$starterr:33;"): #instrument is busy/sleepy
-            message_type = "ERROR"
-            parsed_data = False
-        elif message.startswith("$starterr:44;"): #overexposed error
-            message_type = "ERROR"
-            parsed_data = False
-        elif message.startswith("$stopack;"):
-            message_type = "STOP_ACK"
-            parsed_data = None
-        elif message.startswith("$startack;"):
-            message_type = "START_ACK"
-            parsed_data = True
-        elif message.startswith("$autocheckpassed;"):
-            message_type = "Autocheck"
-            parsed_data = True
-        elif message.startswith("HW_CONF"):
-            message_type = "HW_CONF"
-            parsed_data = self.parse_hwconf(message)
-        elif message.startswith("ACQ_CONF"):
-            message_type = "ACQ_CONF"
-            parsed_data = self.parse_acqconf(message)
-        elif message.startswith("TAXO_CONF"):
-            message_type = "TAXO_CONF"
-            parsed_data = self.parse_taxoconf(message)
-        elif message.startswith("LPM_DATA"):
-            message_type = "LPM_DATA"
-            parsed_data = self.parse_lpm_data(message)
-        elif message.startswith("BLACK_DATA"):
-            message_type = "BLACK_DATA"
-            parsed_data = self.parse_black_data(message)
-        elif message.startswith("TAXO_DATA"):
-            message_type = "TAXO_DATA"
-            parsed_data = self.parse_taxo_data(message)
-        else:
-            message_type = "UNKNOWN"
-            parsed_data = None
-
-        return message_type, parsed_data
 
     def reconnect(self):
         """Check connection and reconnect to UVP6 if needed."""
