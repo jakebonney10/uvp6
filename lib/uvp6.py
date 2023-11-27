@@ -2,7 +2,7 @@ import serial
 import time
 
 class UVP6:
-    def __init__(self, port='COM1', baudrate=9600):
+    def __init__(self, port='/dev/ttyUSB0', baudrate=9600):
         self.ser = serial.Serial(port, baudrate, timeout=1)
         time.sleep(2)  # wait for the serial connection to initialize
 
