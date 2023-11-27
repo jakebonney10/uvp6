@@ -2,19 +2,29 @@
 
 ## Description
 
-The `uvp6` ROS package provides an interface for the Underwater Vision Profiler 6 (UVP6), enabling control and data acquisition via RS232 communication. This package includes a Python driver for UVP6, custom ROS messages, and a driver node for real-time data handling and publishing.
-
+The UVP6 ROS Driver is a comprehensive package designed for seamless integration and operation of the Underwater Vision Profiler 6 (UVP6) with autonomous surface or underwater vehicles (ASVs or UUVs) in supervised mode. This package enables real-time data acquisition, processing, and control of the UVP6, supporting various research and monitoring activities in marine environments.
 ## Features
 
-- Control and data acquisition from UVP6 via RS232.
+- Control and data acquisition from UVP6 via RS232 in SUPERVISED mode.
 - ROS messages for HWconf, ACQconf, LPM_DATA, and BLACK_DATA frames.
 - ROS node for data acquisition and publishing.
 - Handles start and stop of data acquisition.
-- Custom Python driver for UVP6.
+- Custom Python library for UVP6 communication.
 
 ## Installation
 
-Please follow the standard ROS package installation procedures to install `uvp6`.
+Please follow the standard ROS package installation procedures to install `uvp6`. Clone the repository into your ROS workspace:
+
+```bash
+cd ~/catkin_ws/src
+git clone https://github.com/your-username/uvp6-ros-driver.git
+```
+
+Navigate back to your catkin workspace and compile:
+```bash
+cd ~/catkin_ws
+catkin_make
+```
 
 ## Usage
 
@@ -33,10 +43,11 @@ roslaunch uvp6 upv6.launch
 ## Custom ROS Messages
 This package includes custom ROS messages for different data frames from the UVP6:
 
-- `HWconfMsg`
-- `ACQconfMsg`
-- `LPMDataMsg`
-- `BlackDataMsg`
+- `HWconfMsg`: Hardware configuration data.
+- `ACQconfMsg`: Acquisition configuration data.
+- `TAXOconfMsg`: 
+- `LPMDataMsg`: Large particle measurement data.
+- `BlackDataMsg`: Data from black frames.
 
 ## Setting Parameters via Command Line
 
@@ -59,7 +70,7 @@ After setting these parameters, you can run the UVP6 driver node as described in
 UVP6 comes in two models: UVP6HF and UVP6LP, with different power consumption profiles. UVP6HF consumes 6W during acquisition and 0.02W in standby, whereas UVP6LP consumes 0.8W during acquisition and 0.02W in standby.
 
 ### Operational Modes
-UVP6 supports different operation modes suitable for various deployments.
+UVP6 supports different operation modes suitable for various deployments, this driver is meant to control the device in SUPERVISED mode.
 
 ### Storage
 Equipped with a minimum of 400GB of mass storage.
@@ -81,6 +92,7 @@ Equipped with a minimum of 400GB of mass storage.
 
 ### End of Cruise
 - Remove the instrument from its host/frame without disassembling the camera from the arm.
+- DO NOT disconnect the blue cable from the camera housing as it will require reprogramming. 
 - Clean and pack the instrument.
 
 ### Data Processing
@@ -90,6 +102,15 @@ Equipped with a minimum of 400GB of mass storage.
 - **Optical Alignment**: Do not disconnect the arm connecting the camera to the light unit.
 - **Sunlight Protection**: Avoid exposing the instrument to direct sunlight.
 - **Connector Care**: Prevent corrosion and follow maintenance recommendations.
+
+## Documentation
+
+- [UVP6 Publication](docs/Limnology-OceanMethods-2021-Picheral-The_Underwater_Vision_Profiler6_ an_imaging_sensor_of_particle_size_spectra.pdf): Literature on the UVP6 device.
+- [UVP6 User Guide](docs/uvp6_user_guide_20220309.pdf): Detailed instructions and specifications for the UVP6 instrument.
+- [UVP6 Supervised RT Data Specifications](docs/UVP6_supervised_RTdata_specifications_20231123.pdf): Specifications for real-time data handling in supervised mode.
+
+## Contributing
+Contributions to the UVP6 ROS Driver are welcome. Please follow standard ROS development practices for contributions. You can fork and create pull requests as I will be regularly maintaining this package through 2024.
 
 ## License
 This code was written under the MIT license.
