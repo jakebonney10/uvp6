@@ -1,8 +1,12 @@
 # UVP6 ROS Package
 
 ## Description
-
 The UVP6 ROS Driver is a package designed for integration and operation of the Underwater Vision Profiler 6 (UVP6) with autonomous surface or underwater vehicles (ASVs or UUVs) in supervised mode. This package enables real-time data acquisition, processing, and control of the UVP6, supporting various research and monitoring activities in marine environments.
+
+<p align="right">
+  <img src="/docs/uvp6-hf.jpg" alt="UVP6-HF from Hydroptic" width="250"/>
+</p>
+
 ## Features
 
 - Control and data acquisition from UVP6 via RS232 in SUPERVISED mode.
