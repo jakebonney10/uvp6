@@ -107,7 +107,7 @@ Equipped with a minimum of 400GB of mass storage.
 
 ## Documentation
 
-- [UVP6 Publication](docs/Limnology-OceanMethods-2021-Picheral-The_Underwater_Vision_Profiler6_ an_imaging_sensor_of_particle_size_spectra.pdf): Literature on the UVP6 device.
+- [UVP6 Publication](docs/Limnology-OceanMethods-2021-Picheral-The_Underwater_Vision_Profiler6_an_imaging_sensor_of_particle_size_spectra.pdf): Literature on the UVP6 device.
 - [UVP6 User Guide](docs/uvp6_user_guide_20220309.pdf): Detailed instructions and specifications for the UVP6 instrument.
 - [UVP6 Supervised RT Data Specifications](docs/UVP6_supervised_RTdata_specifications_20231123.pdf): Specifications for real-time data handling in supervised mode.
 
