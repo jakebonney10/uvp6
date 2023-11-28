@@ -28,11 +28,6 @@ class UVP6:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def read_response(self):
-        """Read response from UVP6 instrument."""
-        response = self.ser.readline().decode().strip()
-        return self.message_handler(response)
-
     def start_acquisition(self, acq_conf, date=None, time=None):
         """Start data acquisition (Ex. Format $start:ACQ_XX,20220223,040051;)."""
         if date and time:
@@ -73,6 +68,11 @@ class UVP6:
         time.sleep(0.5)
         self.auto_check()
 
+    def read_response(self):
+        """Read response from UVP6 instrument."""
+        response = self.ser.readline().decode().strip()
+        return self.message_handler(response)
+
     def message_handler(self, message):
         """Handle messages from UVP6"""
         response_handlers = {
@@ -88,11 +88,9 @@ class UVP6:
             "BLACK_DATA": self.parse_black_data,
             "TAXO_DATA": self.parse_taxo_data
         }
-
         for key in response_handlers:
             if message.startswith(key):
                 return key, response_handlers[key](message)
-
         return "UNKNOWN", None
 
     def handle_error(self, message):
@@ -225,11 +223,8 @@ class UVP6:
             "IMG": int(taxo_data[1]),
             "Objects": []
         }
-
-        # Parsing objects data
         num_fields_per_object = 3  # NNi, VVi, and GGi for each object
         num_objects = (len(taxo_data) - 2) // num_fields_per_object
-
         for i in range(num_objects):
             start_index = 2 + i * num_fields_per_object
             object_data = {
@@ -238,7 +233,6 @@ class UVP6:
                 "Grey_Level": int(taxo_data[start_index + 2])
             }
             taxo_data_dict["Objects"].append(object_data)
-
         return taxo_data_dict
 
     def reconnect(self):
