@@ -52,9 +52,13 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    AcqConf.msg
-   BlackData.msg
    HwConf.msg
+   TaxoConf.msg
    LpmData.msg
+   BlackData.msg
+   TaxoData.msg
+   ObjectData.msg
+
  )
 
 ## Generate services in the 'srv' folder
