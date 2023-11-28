@@ -13,7 +13,8 @@ class UVP6DriverNode:
         baudrate = rospy.get_param('~baudrate', 9600)
 
         # Create a UVP6 object
-        self.uvp6 = UVP6(port, baudrate)  # Initialize the serial connection
+        self.uvp6 = UVP6()
+        self.uvp6.connect(port, baudrate) # initialize serial connection
 
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hw_conf', HwConf, queue_size=10)
@@ -22,7 +23,6 @@ class UVP6DriverNode:
         self.lpmdata_pub = rospy.Publisher('lpm_data', LpmData, queue_size=10)
         self.blackdata_pub = rospy.Publisher('black_data', BlackData, queue_size=10)
         self.taxodata_pub = rospy.Publisher('black_data', TaxoData, queue_size=10)
-
 
     def publish_data(self, msg_type, parsed_data):
         # Publish data based on the message type
@@ -34,6 +34,10 @@ class UVP6DriverNode:
             msg = AcqConf()  # Create and populate the ACQconfMsg
             # Populate msg fields with parsed_data
             self.acqconf_pub.publish(msg)
+        elif msg_type == "TAXO_CONF":
+            msg = TaxoConf()  # Create and populate the ACQconfMsg
+            # Populate msg fields with parsed_data
+            self.taxoconf_pub.publish(msg)
         elif msg_type == "LPM_DATA":
             msg = LpmData()  # Create and populate the LPMDataMsg
             # Populate msg fields with parsed_data
@@ -42,6 +46,10 @@ class UVP6DriverNode:
             msg = BlackData()  # Create and populate the BlackDataMsg
             # Populate msg fields with parsed_data
             self.blackdata_pub.publish(msg)
+        elif msg_type == "TAXO_DATA":
+            msg = TaxoData()  # Create and populate the BlackDataMsg
+            # Populate msg fields with parsed_data
+            self.taxodata_pub.publish(msg)
 
     def run(self):
         # Start data acquisition - adjust the parameters as needed
