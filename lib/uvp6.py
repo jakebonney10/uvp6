@@ -161,13 +161,8 @@ class UVP6:
             "Model_reference": taxoconf_data[2],
             "Max_size_for_classification": int(taxoconf_data[3]),
             "Model_nb_classes": int(taxoconf_data[4]),
+            "Taxo_ids": [int(id) for id in taxoconf_data[5:]]
         }
-        # Parsing Taxo IDs for each class
-        num_classes = 40  # Number of taxonomic classes (adjust as needed)
-        for i in range(num_classes):
-            class_key = f"Taxo_ID_for_class_{str(i).zfill(2)}"
-            taxoconf_dict[class_key] = int(taxoconf_data[5 + i])
-
         return taxoconf_dict
 
     def parse_lpm_data(self, lpm_data_frame):
