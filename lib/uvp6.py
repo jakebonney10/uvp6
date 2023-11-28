@@ -66,8 +66,11 @@ class UVP6:
     def instrument_check(self, acq_conf=1, taxo_conf=1):
         """Perform instrument check sequence. Verify configuration"""
         self.hwconf_check()
+        time.sleep(0.5)
         self.conf_check(acq_conf)
+        time.sleep(0.5)
         self.taxo_check(taxo_conf)
+        time.sleep(0.5)
         self.auto_check()
 
     def message_handler(self, message):
