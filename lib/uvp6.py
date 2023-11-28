@@ -2,24 +2,36 @@ import serial
 import time
 
 class UVP6:
-    def __init__(self, port='/dev/ttyUSB0', baudrate=38400):
-        self.ser = serial.Serial(port, baudrate, timeout=1)
-        time.sleep(2)  # wait for the serial connection to initialize
+    def __init__(self):
+        self.ser = None
+
+    def connect(self, port='/dev/ttyUSB0', baudrate=38400):
+         """Establishes the serial connection."""
+         try:
+             self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+             time.sleep(2)  # Wait for the serial connection to initialize
+             print("Serial connection established.")
+         except serial.SerialException as e:
+             print(f"Failed to establish serial connection: {e}")
 
     def send_command(self, command):
-        """Send a command to the UVP6 instrument and read response."""
+        """Send a command to the UVP6 instrument."""
         try:
             self.ser.write(f'{command}\r\n'.encode())
-            return self.read_response()
         except serial.SerialException as e:
-            print(f"Serial communication error: {e}") #TODO: handle this error
+            print(f"Serial communication error: {e}")
+            self.reconnect()  # Attempt to reconnect
+            try:
+                self.ser.write(f'{command}\r\n'.encode())
+            except Exception as e:
+                print(f"Failed to send command after reconnecting: {e}")
         except Exception as e:
-            print(f"Unexpected error: {e}") #TODO: handle this error
+            print(f"Unexpected error: {e}")
 
     def read_response(self):
         """Read response from UVP6 instrument."""
         response = self.ser.readline().decode().strip()
-        return response
+        return self.message_handler(response)
 
     def start_acquisition(self, acq_conf, date=None, time=None):
         """Start data acquisition (Ex. Format $start:ACQ_XX,20220223,040051;)."""
@@ -33,23 +45,30 @@ class UVP6:
         """Stop data acquisition."""
         return self.send_command('$stop;')
 
-    def autocheck(self):
-        """Perform autocheck."""
-        return self.send_command('$autocheck;')
+    def hwconf_check(self):
+        """Perform check of hardware configuration."""
+        return self.send_command('$hwconfcheck;')
 
-    def confcheck(self, acq_conf=1):
+    def conf_check(self, acq_conf=1):
         """Perform check of aquisition configuration, specify 1-10."""
         command = f'$confcheck:ACQ_{str(acq_conf).zfill(2)};'
         return self.send_command(command)
 
-    def hwconfcheck(self):
-        """Perform check of hardware configuration."""
-        return self.send_command('$hwconfcheck;')
-
-    def taxocheck(self, taxo_conf=1):
+    def taxo_check(self, taxo_conf=1):
         """Perform check of taxonomy configuration, specify 1-10."""
         command = f'$taxocheck:TAXO_{str(taxo_conf).zfill(2)};'
         return self.send_command(command)
+
+    def auto_check(self):
+        """Perform autocheck."""
+        return self.send_command('$autocheck;')
+
+    def instrument_check(self, acq_conf=1, taxo_conf=1):
+        """Perform instrument check sequence. Verify configuration"""
+        self.hwconf_check()
+        self.conf_check(acq_conf)
+        self.taxo_check(taxo_conf)
+        self.auto_check()
 
     def message_handler(self, message):
         """Handle messages from UVP6"""
@@ -77,7 +96,7 @@ class UVP6:
         """Handle different types of errors"""
         if "starterr:33;" in message:
             print("Error 33: Instrument is busy/sleepy.")
-            return self.stop_acquisition
+            return self.stop_acquisition()
         elif "starterr:44;" in message:
             print("Error 44: Overexposed error.")
 
