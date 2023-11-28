@@ -12,9 +12,9 @@ class UVP6:
             self.ser.write(f'{command}\r\n'.encode())
             return self.read_response()
         except serial.SerialException as e:
-            print(f"Serial communication error: {e}") #TODO: handle this error, ROS logging instead of print?
+            print(f"Serial communication error: {e}") #TODO: handle this error
         except Exception as e:
-            print(f"Unexpected error: {e}") #TODO: handle this error, ROS logging instead of print?
+            print(f"Unexpected error: {e}") #TODO: handle this error
 
     def read_response(self):
         """Read response from UVP6 instrument."""
@@ -22,7 +22,7 @@ class UVP6:
         return response
 
     def start_acquisition(self, acq_conf, date=None, time=None):
-        """Start data acquisition (Ex. Format start:ACQ_XX,20220223,040051;)."""
+        """Start data acquisition (Ex. Format $start:ACQ_XX,20220223,040051;)."""
         if date and time:
             command = f'$start:{str(acq_conf).zfill(2)},{date},{time};'
         else:
@@ -56,9 +56,9 @@ class UVP6:
         response_handlers = {
             "$starterr:33;": self.handle_error,
             "$starterr:44;": self.handle_error,
-            "$stopack;": self.handle_stop_ack, #TODO:
-            "$startack;": self.handle_start_ack, #TODO:
-            "$autocheckpassed;": self.handle_autocheck, #TODO:
+            "$stopack;": self.handle_stop_ack,
+            "$startack;": self.handle_start_ack,
+            "$autocheckpassed;": self.handle_autocheck,
             "HW_CONF": self.parse_hwconf,
             "ACQ_CONF": self.parse_acqconf,
             "TAXO_CONF": self.parse_taxoconf,
@@ -74,7 +74,21 @@ class UVP6:
         return "UNKNOWN", None
 
     def handle_error(self, message):
-        return False  # TODO: or any appropriate handling
+        """Handle different types of errors"""
+        if "starterr:33;" in message:
+            print("Error 33: Instrument is busy/sleepy.")
+            return self.stop_acquisition
+        elif "starterr:44;" in message:
+            print("Error 44: Overexposed error.")
+
+    def handle_stop_ack(self, message):
+        print("Acquisition stopped successfully.")
+
+    def handle_start_ack(self, message):
+        print("Acquisition started successfully.")
+
+    def handle_autocheck(self, message):
+        print("Autocheck passed.")
 
     def parse_hwconf(self, hwconf_frame):
         """Parse the hardware configuration serial message from UVP6."""
