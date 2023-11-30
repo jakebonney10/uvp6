@@ -28,12 +28,12 @@ class UVP6:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def start_acquisition(self, acq_conf, date=None, time=None): # TODO: command doesnt work, returns $starterr:51
-        """Start data acquisition (Ex. Format $start:ACQ_XX,20220223,040051;)."""
+    def start_acquisition(self, acq_conf, date=None, time=None):
+        """Start data acquisition (Ex. Format $start:ACQ_SUP_XX,20220223,040051;)."""
         if date and time:
-            command = f'$start:{str(acq_conf).zfill(2)},{date},{time};'
+            command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)},{date},{time};' #TODO: make this more universal, ex.) start CTD_ACQ
         else:
-            command = f'$start:{str(acq_conf).zfill(2)};'
+            command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)};'
         return self.send_command(command)
 
     def stop_acquisition(self):
@@ -45,12 +45,12 @@ class UVP6:
         return self.send_command('$hwconfcheck;')
 
     def conf_check(self, acq_conf=1):
-        """Perform check of aquisition configuration, specify 1-10.""" # TODO: command doesnt work, returns $starterr:51
-        command = f'$confcheck:ACQ_{str(acq_conf).zfill(2)};'
+        """Perform check of aquisition configuration, specify 1-10."""
+        command = f'$confcheck:ACQ_SUP_{str(acq_conf).zfill(2)};'
         return self.send_command(command)
 
     def taxo_check(self, taxo_conf=1):
-        """Perform check of taxonomy configuration, specify 1-10.""" # TODO: command doesnt work, returns $starterr:30
+        """Perform check of taxonomy configuration, specify 1-10.""" # TODO: command is invalid, returns $starterr:30
         command = f'$taxocheck:TAXO_{str(taxo_conf).zfill(2)};'
         return self.send_command(command)
 
@@ -64,8 +64,8 @@ class UVP6:
         time.sleep(0.5)
         self.conf_check(acq_conf)
         time.sleep(0.5)
-        self.taxo_check(taxo_conf)
-        time.sleep(0.5)
+        #self.taxo_check(taxo_conf)
+        #time.sleep(0.5)
         self.auto_check()
 
     def read_response(self):
@@ -75,9 +75,10 @@ class UVP6:
 
     def message_handler(self, message):
         """Handle messages from UVP6"""
-        response_handlers = {
+        response_handlers = { # TODO: Define python dict's outside of method, maybe in another file or in _init_ method.
             "$starterr:33;": self.handle_error,
             "$starterr:44;": self.handle_error,
+            "$starterr:51;": self.handle_error,
             "$stopack;": self.handle_stop_ack,
             "$startack;": self.handle_start_ack,
             "$autocheckpassed;": self.handle_autocheck,
@@ -100,6 +101,8 @@ class UVP6:
             return self.stop_acquisition()
         elif "starterr:44;" in message:
             print("Error 44: Overexposed error.")
+        elif "starterr:51;" in message:
+            print("Error 51: Invalid start config.")
 
     def handle_stop_ack(self, message):
         print("Acquisition stopped successfully.")
