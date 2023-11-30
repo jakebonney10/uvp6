@@ -28,7 +28,7 @@ class UVP6:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def start_acquisition(self, acq_conf, date=None, time=None):
+    def start_acquisition(self, acq_conf, date=None, time=None): # TODO: command doesnt work, returns $starterr:51
         """Start data acquisition (Ex. Format $start:ACQ_XX,20220223,040051;)."""
         if date and time:
             command = f'$start:{str(acq_conf).zfill(2)},{date},{time};'
@@ -45,12 +45,12 @@ class UVP6:
         return self.send_command('$hwconfcheck;')
 
     def conf_check(self, acq_conf=1):
-        """Perform check of aquisition configuration, specify 1-10."""
+        """Perform check of aquisition configuration, specify 1-10.""" # TODO: command doesnt work, returns $starterr:51
         command = f'$confcheck:ACQ_{str(acq_conf).zfill(2)};'
         return self.send_command(command)
 
     def taxo_check(self, taxo_conf=1):
-        """Perform check of taxonomy configuration, specify 1-10."""
+        """Perform check of taxonomy configuration, specify 1-10.""" # TODO: command doesnt work, returns $starterr:30
         command = f'$taxocheck:TAXO_{str(taxo_conf).zfill(2)};'
         return self.send_command(command)
 
