@@ -71,6 +71,7 @@ class UVP6:
     def read_response(self):
         """Read response from UVP6 instrument."""
         response = self.ser.readline().decode().strip()
+        response = response.rstrip(';') #remove semicolon from end of message
         return self.message_handler(response)
 
     def message_handler(self, message):
@@ -172,7 +173,7 @@ class UVP6:
             "Aux_mode": acqconf_data[19],
             "Aux_param_1": acqconf_data[20],
             "Aux_param_2": acqconf_data[21],
-            "Remaining_memory": int(acqconf_data[22].rstrip(';'))  # Remove semicolon before conversion
+            "Remaining_memory": int(acqconf_data[22])
         }
         return acqconf_dict
 
