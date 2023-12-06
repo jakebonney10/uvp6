@@ -172,7 +172,7 @@ class UVP6:
             "Aux_mode": acqconf_data[19],
             "Aux_param_1": acqconf_data[20],
             "Aux_param_2": acqconf_data[21],
-            "Remaining_memory": int(acqconf_data[22])
+            "Remaining_memory": int(acqconf_data[22].rstrip(';'))  # Remove semicolon before conversion
         }
         return acqconf_dict
 
