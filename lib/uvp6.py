@@ -75,6 +75,7 @@ class UVP6:
 
     def message_handler(self, message):
         """Handle messages from UVP6"""
+        print(message)
         response_handlers = { # TODO: Define python dict's outside of method, maybe in another file or in _init_ method.
             "$starterr:33;": self.handle_error,
             "$starterr:44;": self.handle_error,
@@ -162,7 +163,7 @@ class UVP6:
             "Vignetting_lower_limit_size": int(acqconf_data[10]),
             "Appendices_ratio": float(acqconf_data[11]),
             "Interval_for_measuring_background_noise": float(acqconf_data[12]),
-            "Image_nb_for_smoothing": int(acqconf_data[13]),
+            "Image_nb_for_smoothing": float(acqconf_data[13]),
             "Analog_output_activation": bool(int(acqconf_data[14])),
             "Gain_for_analog_out": float(acqconf_data[15]),
             "Maximal_internal_temperature": float(acqconf_data[16]),
