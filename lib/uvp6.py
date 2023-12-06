@@ -8,7 +8,7 @@ class UVP6:
     def connect(self, port='/dev/ttyUSB0', baudrate=38400):
          """Establishes the serial connection."""
          try:
-             self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+             self.ser = serial.Serial(port, baudrate, timeout=1)
              time.sleep(2)  # Wait for the serial connection to initialize
              print("Serial connection established.")
          except serial.SerialException as e:
