@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from uvp6.msg import HwConf, AcqConf, LpmData, BlackData, TaxoConf, TaxoData
+from uvp6.msg import HwConf, AcqConf, LpmData, BlackData
 from uvp6 import UVP6
 
 class UVP6DriverNode:
@@ -8,9 +8,10 @@ class UVP6DriverNode:
         # Initialize the ROS node
         rospy.init_node('uvp6_driver')
 
-        # Retrieve serial connection cfg from the parameter server or use default values
+        # Retrieve settings from parameter server or use default values
         port = rospy.get_param('~port', '/dev/ttyUSB0')
         baudrate = rospy.get_param('~baudrate', 9600)
+        self.acq_conf =  rospy.get_param('~acq_conf', 1)
 
         # Create a UVP6 object
         self.uvp6 = UVP6()
@@ -19,41 +20,27 @@ class UVP6DriverNode:
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hw_conf', HwConf, queue_size=10)
         self.acqconf_pub = rospy.Publisher('acq_conf', AcqConf, queue_size=10)
-        self.taxoconf_pub = rospy.Publisher('taxo_conf', TaxoConf, queue_size=10)
         self.lpmdata_pub = rospy.Publisher('lpm_data', LpmData, queue_size=10)
         self.blackdata_pub = rospy.Publisher('black_data', BlackData, queue_size=10)
-        self.taxodata_pub = rospy.Publisher('black_data', TaxoData, queue_size=10)
 
     def publish_data(self, msg_type, parsed_data):
         # Publish data based on the message type
         if msg_type == "HW_CONF":
-            msg = HwConf()  # Create and populate the HWconfMsg
-            # Populate msg fields with parsed_data
+            msg = HwConf()
             self.hwconf_pub.publish(msg)
         elif msg_type == "ACQ_CONF":
-            msg = AcqConf()  # Create and populate the ACQconfMsg
-            # Populate msg fields with parsed_data
+            msg = AcqConf()
             self.acqconf_pub.publish(msg)
-        elif msg_type == "TAXO_CONF":
-            msg = TaxoConf()  # Create and populate the ACQconfMsg
-            # Populate msg fields with parsed_data
-            self.taxoconf_pub.publish(msg)
         elif msg_type == "LPM_DATA":
-            msg = LpmData()  # Create and populate the LPMDataMsg
-            # Populate msg fields with parsed_data
+            msg = LpmData()
             self.lpmdata_pub.publish(msg)
         elif msg_type == "BLACK_DATA":
-            msg = BlackData()  # Create and populate the BlackDataMsg
-            # Populate msg fields with parsed_data
+            msg = BlackData()
             self.blackdata_pub.publish(msg)
-        elif msg_type == "TAXO_DATA":
-            msg = TaxoData()  # Create and populate the BlackDataMsg
-            # Populate msg fields with parsed_data
-            self.taxodata_pub.publish(msg)
 
     def run(self):
-        # Start data acquisition - adjust the parameters as needed
-        self.uvp6.start_acquisition("some_parameter_set")
+        # Start data acquisition - choose AcqConf
+        self.uvp6.start_acquisition(self.acq_conf)
 
         # Main loop
         while not rospy.is_shutdown():
