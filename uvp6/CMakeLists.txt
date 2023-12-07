@@ -49,17 +49,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   AcqConf.msg
-   HwConf.msg
-   TaxoConf.msg
-   LpmData.msg
-   BlackData.msg
-   TaxoData.msg
-   ObjectData.msg
-
- )
+# add_message_files(
+#   FILES
+#   AcqConf.msg
+#   HwConf.msg
+#   TaxoConf.msg
+#   LpmData.msg
+#   BlackData.msg
+#   TaxoData.msg
+#   ObjectData.msg
+#
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
