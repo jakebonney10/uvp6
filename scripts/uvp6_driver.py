@@ -23,6 +23,22 @@ class UVP6DriverNode:
         self.lpmdata_pub = rospy.Publisher('lpm_data', LpmData, queue_size=10)
         self.blackdata_pub = rospy.Publisher('black_data', BlackData, queue_size=10)
 
+        # Run instrument check sequence
+        self.instrument_check()
+
+    def instrument_check(self):
+        """Perform instrument check sequence. Verify config"""
+        self.uvp6.rtc_read()
+        self.uvp6.read_response()
+        self.uvp6.rtc_set()
+        self.uvp6.read_response()
+        self.uvp6.hwconf_check()
+        self.uvp6.read_response()
+        self.uvp6.conf_check(self.acq_conf)
+        self.uvp6.read_response()
+        self.auto_check()
+        self.uvp6.read_response()
+
     def publish_data(self, msg_type, parsed_data):
         # Publish data based on the message type
         if msg_type == "HW_CONF":
