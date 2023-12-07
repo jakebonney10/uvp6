@@ -31,7 +31,7 @@ class UVP6:
     def start_acquisition(self, acq_conf, date=None, time=None):
         """Start data acquisition (Ex. Format $start:ACQ_SUP_XX,20220223,040051;)."""
         if date and time:
-            command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)},{date},{time};' #TODO: make this more universal, ex.) start CTD_ACQ
+            command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)},{date},{time};' #TODO: make this more universal, ex.) start CTD_ACQ, take a string as input.
         else:
             command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)};'
         return self.send_command(command)
@@ -39,6 +39,15 @@ class UVP6:
     def stop_acquisition(self):
         """Stop data acquisition."""
         return self.send_command('$stop;')
+
+    def rtc_read(self):
+        """Request the current RTC (Real Time Clock) from the UVP6."""
+        return self.send_command('$RTCread;')
+
+    def rtc_set(self, datetime_str):
+        """Set the RTC (Real Time Clock) on the UVP6."""
+        command = f'$RTCset:{datetime_str};'
+        return self.send_command(command)
 
     def hwconf_check(self):
         """Perform check of hardware configuration."""
@@ -78,12 +87,14 @@ class UVP6:
         """Handle messages from UVP6"""
         print(message)
         response_handlers = { # TODO: Define python dict's outside of method, maybe in another file or in _init_ method.
+            "$ok;": self.handle_ok,
             "$starterr:33;": self.handle_error,
             "$starterr:44;": self.handle_error,
             "$starterr:51;": self.handle_error,
             "$stopack;": self.handle_stop_ack,
             "$startack;": self.handle_start_ack,
             "$autocheckpassed;": self.handle_autocheck,
+            "$RTCread:": self.parse_rtc_read,
             "HW_CONF": self.parse_hwconf,
             "ACQ_CONF": self.parse_acqconf,
             "TAXO_CONF": self.parse_taxoconf,
@@ -95,6 +106,10 @@ class UVP6:
             if message.startswith(key):
                 return key, response_handlers[key](message)
         return "UNKNOWN", None
+
+    def handle_ok_response(self, response):
+        """Handle the ok recv response. Usually sent after a command is received by UVP6 but not always."""
+        return {"Response": "OK"}
 
     def handle_error(self, message):
         """Handle different types of errors"""
@@ -114,6 +129,11 @@ class UVP6:
 
     def handle_autocheck(self, message):
         print("Autocheck passed.")
+
+    def parse_rtc_read(self, response):
+        """Parse the response from RTC read command."""
+        rtc_dt = response.split(':')[1]  # Splitting at ':' and taking the second part
+        return {"RTC": rtc_dt}
 
     def parse_hwconf(self, hwconf_frame):
         """Parse the hardware configuration serial message from UVP6."""
