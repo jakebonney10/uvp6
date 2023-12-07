@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from uvp6.msg import HwConf, AcqConf, LpmData, BlackData
 from uvp6 import UVP6
