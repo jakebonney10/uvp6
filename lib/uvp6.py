@@ -1,5 +1,6 @@
 import serial
 import time
+from datetime import datetime
 
 class UVP6:
     def __init__(self):
@@ -44,8 +45,11 @@ class UVP6:
         """Request the current RTC (Real Time Clock) from the UVP6."""
         return self.send_command('$RTCread;')
 
-    def rtc_set(self, datetime_str):
-        """Set the RTC (Real Time Clock) on the UVP6."""
+    def rtc_set(self, datetime_str=None):
+        """Set the RTC (Real Time Clock) on the UVP6 using current UTC time or provided time."""
+        if datetime_str is None:
+            # Format current UTC time as YYYYMMDD,HHMMSS
+            datetime_str = datetime.utcnow().strftime('%Y%m%d,%H%M%S')
         command = f'$RTCset:{datetime_str};'
         return self.send_command(command)
 
@@ -107,7 +111,7 @@ class UVP6:
                 return key, response_handlers[key](message)
         return "UNKNOWN", None
 
-    def handle_ok_response(self, response):
+    def handle_ok(self, response):
         """Handle the ok recv response. Usually sent after a command is received by UVP6 but not always."""
         return {"Response": "OK"}
 
