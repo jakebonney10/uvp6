@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from uvp6.msg import HwConf, AcqConf, LpmData, BlackData
+from uvp6_msgs.msg import HwConf, AcqConf, LpmData, BlackData
 from uvp6 import UVP6
 
 class UVP6DriverNode:
@@ -16,6 +16,7 @@ class UVP6DriverNode:
         # Create a UVP6 object
         self.uvp6 = UVP6()
         self.uvp6.connect(port, baudrate) # initialize serial connection
+        rospy.sleep(5)
 
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hw_conf', HwConf, queue_size=10)
@@ -24,7 +25,7 @@ class UVP6DriverNode:
         self.blackdata_pub = rospy.Publisher('black_data', BlackData, queue_size=10)
 
         # Run instrument check sequence
-        self.instrument_check()
+        #self.instrument_check()
 
     def instrument_check(self):
         """Perform instrument check sequence. Verify config"""
@@ -36,7 +37,7 @@ class UVP6DriverNode:
         self.uvp6.read_response()
         self.uvp6.conf_check(self.acq_conf)
         self.uvp6.read_response()
-        self.auto_check()
+        self.uvp6.auto_check()
         self.uvp6.read_response()
 
     def publish_data(self, msg_type, parsed_data):
@@ -57,19 +58,17 @@ class UVP6DriverNode:
     def run(self):
         # Start data acquisition - choose AcqConf
         self.uvp6.start_acquisition(self.acq_conf)
+        rospy.sleep(2)
 
         # Main loop
         while not rospy.is_shutdown():
             # Read serial data, parse it and publish
             try:
-                serial_data = self.uvp6.read_response()
-                if serial_data:
-                    msg_type, parsed_data = self.uvp6.parse_message(serial_data)
-                    if parsed_data:
-                        self.publish_data(msg_type, parsed_data)
+                self.uvp6.read_response()
             except Exception as e:
                 rospy.logerr("Error reading from UVP6: %s", e)
                 break
+            rospy.sleep(1)
 
         # Stop data acquisition
         self.uvp6.stop_acquisition()

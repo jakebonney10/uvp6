@@ -35,6 +35,7 @@ class UVP6:
             command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)},{date},{time};' #TODO: make this more universal, ex.) start CTD_ACQ, take a string as input.
         else:
             command = f'$start:ACQ_SUP_{str(acq_conf).zfill(2)};'
+        print("Starting Acquisition")
         return self.send_command(command)
 
     def stop_acquisition(self):
@@ -79,7 +80,6 @@ class UVP6:
 
     def message_handler(self, message):
         """Handle messages from UVP6"""
-        print(message)
         response_handlers = { # TODO: Define python dict's outside of method, maybe in another file or in _init_ method.
             "$ok;": self.handle_ok,
             "$starterr:33;": self.handle_error,
@@ -103,6 +103,7 @@ class UVP6:
 
     def handle_ok(self, response):
         """Handle the ok recv response. Usually sent after a command is received by UVP6 but not always."""
+        print("ok")
         return {"Response": "OK"}
 
     def handle_error(self, message):
@@ -127,6 +128,7 @@ class UVP6:
     def parse_rtc_read(self, response):
         """Parse the response from RTC read command."""
         rtc_dt = response.split(':')[1]  # Splitting at ':' and taking the second part
+        print(rtc_dt)
         return {"RTC": rtc_dt}
 
     def parse_hwconf(self, hwconf_frame):
