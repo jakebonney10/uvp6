@@ -10,13 +10,13 @@ class UVP6DriverNode:
 
         # Retrieve settings from parameter server or use default values
         port = rospy.get_param('~port', '/dev/ttyUSB0')
-        baudrate = rospy.get_param('~baudrate', 9600)
+        baudrate = rospy.get_param('~baudrate', 38400)
         self.acq_conf =  rospy.get_param('~acq_conf', 1)
 
         # Create a UVP6 object
         self.uvp6 = UVP6()
         self.uvp6.connect(port, baudrate) # initialize serial connection
-        rospy.sleep(5)
+        rospy.sleep(10)
 
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hw_conf', HwConf, queue_size=10)
@@ -58,17 +58,18 @@ class UVP6DriverNode:
     def run(self):
         # Start data acquisition - choose AcqConf
         self.uvp6.start_acquisition(self.acq_conf)
-        rospy.sleep(2)
+        self.uvp6.start_acquisition(self.acq_conf)
 
         # Main loop
         while not rospy.is_shutdown():
             # Read serial data, parse it and publish
+            rospy.sleep(1)
             try:
-                self.uvp6.read_response()
+                msg = self.uvp6.read_response()
+                rospy.loginfo(msg)
             except Exception as e:
                 rospy.logerr("Error reading from UVP6: %s", e)
                 break
-            rospy.sleep(1)
 
         # Stop data acquisition
         self.uvp6.stop_acquisition()

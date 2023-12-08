@@ -8,10 +8,10 @@ class UVP6:
     def connect(self, port='/dev/ttyUSB0', baudrate=38400):
          """Establishes the serial connection."""
          try:
-             #self.ser = serial.Serial(port, baudrate, timeout=1)
-             self.ser = serial.Serial(port, baudrate, bytesize=serial.EIGHTBITS,
-                 parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-                 timeout=0.1, xonxoff=0, rtscts=0)
+             self.ser = serial.Serial(port, baudrate, timeout=1)
+             #self.ser = serial.Serial(port, baudrate, bytesize=serial.EIGHTBITS,
+             #    parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+             #    timeout=0.1, xonxoff=0, rtscts=0)
              print("Serial connection established.")
          except serial.SerialException as e:
              print(f"Failed to establish serial connection: {e}")
