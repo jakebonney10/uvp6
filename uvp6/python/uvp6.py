@@ -1,5 +1,4 @@
 import serial
-import time
 from datetime import datetime
 
 class UVP6:
@@ -76,9 +75,9 @@ class UVP6:
 
     def read_response(self):
         """Read response from UVP6 instrument."""
-        response = self.ser.readline().decode().strip()
-        response = response.rstrip(';') #remove semicolon from end of message
-        return self.message_handler(response)
+        message = self.ser.readline().decode().strip()
+        message = message.rstrip(';') #remove semicolon from end of message
+        return message
 
     def message_handler(self, message):
         """Handle messages from UVP6"""
@@ -112,7 +111,7 @@ class UVP6:
         """Handle different types of errors"""
         if "starterr:33;" in message:
             print("Error 33: Instrument is busy/sleepy.")
-            return self.stop_acquisition()
+            #return self.stop_acquisition() # TODO: Handle this error, maybe resend last command
         elif "starterr:44;" in message:
             print("Error 44: Overexposed error.")
         elif "starterr:51;" in message:
@@ -129,9 +128,9 @@ class UVP6:
 
     def parse_rtc_read(self, response):
         """Parse the response from RTC read command."""
-        rtc_dt = response.split(':')[1]  # Splitting at ':' and taking the second part
-        print(rtc_dt)
-        return {"RTC": rtc_dt}
+        uvp_time = response.split(':')[1]  # Splitting at ':' and taking the second part
+        print(uvp_time)
+        return {"RTC": uvp_time}
 
     def parse_hwconf(self, hwconf_frame):
         """Parse the hardware configuration serial message from UVP6."""
