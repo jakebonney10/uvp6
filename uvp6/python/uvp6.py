@@ -1,20 +1,22 @@
+import rospy
 import serial
+import select
 from datetime import datetime
 
 class UVP6:
     def __init__(self):
         self.ser = None
 
-    def connect(self, port='/dev/ttyUSB0', baudrate=38400):
-         """Establishes the serial connection."""
-         try:
-             self.ser = serial.Serial(port, baudrate, timeout=1)
-             #self.ser = serial.Serial(port, baudrate, bytesize=serial.EIGHTBITS,
-             #    parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-             #    timeout=0.1, xonxoff=0, rtscts=0)
-             print("Serial connection established.")
-         except serial.SerialException as e:
-             print(f"Failed to establish serial connection: {e}")
+    def connect(self, port='/dev/ttyUSB0', baudrate=38400, timeout=1):
+        """Establishes the serial connection."""
+        try:
+            self.ser = serial.Serial(port, baudrate, bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+                timeout=timeout, xonxoff=0, rtscts=0)
+            self.ser.nonblocking()
+            print("Serial connection established.")
+        except serial.SerialException as e:
+            print(f"Failed to establish serial connection: {e}")
 
     def send_command(self, command):
         """Send a command to the UVP6 instrument."""
@@ -73,11 +75,15 @@ class UVP6:
         """Perform autocheck."""
         return self.send_command('$autocheck;')
 
-    def read_response(self):
-        """Read response from UVP6 instrument."""
-        message = self.ser.readline().decode().strip()
-        message = message.rstrip(';') #remove semicolon from end of message
-        return message
+    def read_serial(self):
+        """Read serial message from UVP6 instrument."""
+        rfds, wfds, efds = select.select([self.ser.fileno()], [], [], self.serial_timeout)
+        if rfds.__len__() > 0 and rfds[0] == self.ser.fileno():
+            message = self.ser.readline().decode().strip()
+            message = message.rstrip(';') #remove semicolon from end of message
+            return message
+        else:
+            rospy.logwarn_throttle(self.serial_timeout, '%s - No traffic on %s (%d).' % (self.node_name, self.port, self.baudrate))
 
     def message_handler(self, message):
         """Handle messages from UVP6"""

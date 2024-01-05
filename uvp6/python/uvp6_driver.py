@@ -16,7 +16,7 @@ class UVP6DriverNode:
         # Create a UVP6 object
         self.uvp6 = UVP6()
         self.uvp6.connect(port, baudrate) # initialize serial connection
-        rospy.sleep(10)
+        rospy.sleep(1)
 
         # Publishers for each message type
         self.hwconf_pub = rospy.Publisher('hw_conf', HwConf, queue_size=10)
@@ -30,15 +30,10 @@ class UVP6DriverNode:
     def instrument_check(self):
         """Perform instrument check sequence. Verify config"""
         self.uvp6.rtc_read()
-        self.uvp6.read_response()
         self.uvp6.rtc_set()
-        self.uvp6.read_response()
         self.uvp6.hwconf_check()
-        self.uvp6.read_response()
         self.uvp6.conf_check(self.acq_conf)
-        self.uvp6.read_response()
         self.uvp6.auto_check()
-        self.uvp6.read_response()
 
     def publish_data(self, msg_type, parsed_data):
         # Publish data based on the message type
@@ -58,24 +53,19 @@ class UVP6DriverNode:
     def run(self):
         # Start data acquisition - choose AcqConf
         self.uvp6.start_acquisition(self.acq_conf)
-        self.uvp6.start_acquisition(self.acq_conf)
 
         # Main loop
         while not rospy.is_shutdown():
             # Read serial data, parse it and publish
-            rospy.sleep(1)
             try:
-                msg = self.uvp6.read_response()
+                msg = self.uvp6.read_serialo()
                 rospy.loginfo(msg)
             except Exception as e:
                 rospy.logerr("Error reading from UVP6: %s", e)
                 break
 
-        # Stop data acquisition
-        self.uvp6.stop_acquisition()
-
-        # Close serial connection
-        self.uvp6.close_connection()
+        self.uvp6.stop_acquisition() # Stop data acquisition
+        self.uvp6.close_connection() # Close serial connection
 
 if __name__ == '__main__':
     try:
